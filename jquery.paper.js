@@ -32,7 +32,7 @@
 (function($) {
   $.fn.paper = function(url) {
     return this.each(function() {
-      script = $('<script></script>').attr({
+      $('<script></script>').attr({
         type: 'text/paperscript',
         src: url,
         canvas: $(this).attr('id')
