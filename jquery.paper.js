@@ -10,17 +10,14 @@
  */
 
 (function($) {
-  var count = 0;
   $.fn.paper = function(url) {
     return this.each(function() {
-      var script = $('<script></script>').attr({
+      script = $('<script></script>').attr({
+        type: 'text/paperscript',
         src: url,
         canvas: $(this).attr('id')
-      });
-      var scope = new paper.PaperScope($(this).attr('id') || url
-                                       || 'jquery-paper-' + (count++));
-      script.attr('id', scope.id);
-      paper.evaluate(script.get(0), scope);
+      }).appendTo($('head'));
+      paper.load();
     });
   };
 })(jQuery);
