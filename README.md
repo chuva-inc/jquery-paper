@@ -6,7 +6,9 @@ turning canvas elements into [Paper.js](http://paperjs.org Paper.js) canvases.
 
 The plugin can either be called with a paperscript file location:
 
-    $('#canvas-id').paper('/path/to/paperscript/file.js');
+```javascript
+$('#canvas-id').paper('/path/to/paperscript/file.js');
+```
 
 or a function whose `this` object should be used to store handlers:
 
@@ -22,6 +24,14 @@ $('#canvas-id').paper(function() {
 ```
 
 Note: When using a function, you must use the paper namespace for Paper.js
-specific functions and constructors. You also must explicitly call methods
-instead of using overloaded operators. 
+specific functions and constructors. You also must explicitly call these methods
+instead of using overloaded operators:
+
+* +: `add`
+* -: `subtract`
+* *: `multiply`
+* /: `divide`
+* %: `modulo`
+* ==: `equals`
+* - (prefix sign): `negate`
 
