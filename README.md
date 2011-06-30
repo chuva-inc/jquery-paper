@@ -1,8 +1,8 @@
 jquery-paper
 ============
 
-This is a [jQuery](http://jquery.com jQuery) plugin which adds support for
-turning canvas elements into [Paper.js](http://paperjs.org Paper.js) canvases.
+This is a [jQuery](http://jquery.com) plugin which adds support for
+turning canvas elements into [Paper.js](http://paperjs.og) canvases.
 
 The plugin can either be called with a paperscript file location:
 
