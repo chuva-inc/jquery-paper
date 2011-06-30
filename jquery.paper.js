@@ -1,42 +1,64 @@
-// Copyright (c) 2011 Rory Neithinger
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to
-// deal in the Software without restriction, including without limitation the
-// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-// sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-// IN THE SOFTWARE.
-
 /**
  * jquery-paper
  *
- * This is a jquery plugin for running paperscript files dynamically in the
+ * This is a jquery plugin for running paperscript files or functions in the
  * context of any canvas.
  *
- * Usage:
+ * The plugin takes either the path to a paperscript file, or a function as its
+ * argument.
  *
- *     $('#canvas-id').paper('path/to/paperscript/file.js');
  */
-
 (function($) {
-  $.fn.paper = function(url) {
+  var count = 0;
+  $.fn.paper = function(arg) {
+    if ($.isFunction(arg)) {
+      // apply function to context
+      return this.each(function() {
+        // code more or less copied from paper.js
+        var scope = new paper.PaperScope('jPaperScope-' + (count++));
+        var view = scope.view;
+        var tool = scope.tool = new paper.Tool(null, scope);
+        var res = {};
+        paper = scope;
+        new paper.Project();
+        new paper.View(this).activate();
+        with (scope) {
+          (function() {
+            var handlers = ['onEditOptions', 'onSelect', 'onDeselect',
+                            'onReselect', 'onMouseDown', 'onMouseUp',
+                            'onMouseDown', 'onMouseUp', 'onMouseDrag',
+                            'onMouseMove', 'onKeyDown', 'onKeyUp']
+            // call the functiion with the result object
+            arg.call(res);
+            if (tool) {
+              $.each(handlers, function(i, key) {
+                // copy handlers from result object to the tool
+                tool[key] = res[key];
+              });
+            }
+            if (view) {
+              // code from paperjs, copies more handlers
+              view.onResize = res.onResize;
+              if (res.onFrame) {
+                view.setOnFrame(res.onFrame);
+              } else {
+                view.draw()
+              }
+            }
+          }).call(scope);
+        }
+      });
+    }
+    // run script at url
     return this.each(function() {
+      // add script to head
       $('<script></script>').attr({
+        id: 'jPaperScope-' + (count++),
         type: 'text/paperscript',
-        src: url,
+        src: arg,
         canvas: $(this).attr('id')
       }).appendTo($('head'));
+      // reload paperscript files
       paper.load();
     });
   };
